@@ -1,0 +1,256 @@
+/**
+ * Conteúdo padrão do site. Qualquer chave pode ser sobrescrita pelo admin
+ * (tabela site_content). Imagens ficam vazias por padrão: são definidas pela
+ * biblioteca de mídia — nenhuma URL de imagem crítica é fixa no código.
+ */
+export type ContentField = {
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "image" | "boolean" | "select";
+  options?: string[];
+  default: string;
+};
+
+export type ContentGroup = { id: string; title: string; description?: string; fields: ContentField[] };
+
+export const CONTENT_GROUPS: ContentGroup[] = [
+  {
+    id: "announcement",
+    title: "Barra superior",
+    fields: [
+      { key: "announcement_enabled", label: "Exibir barra", type: "boolean", default: "true" },
+      { key: "announcement_bar", label: "Texto", type: "text", default: "600 g/m² • 100% algodão • Fio penteado" },
+    ],
+  },
+  {
+    id: "hero",
+    title: "Hero (topo da home)",
+    fields: [
+      { key: "hero_enabled", label: "Hero ativo", type: "boolean", default: "true" },
+      { key: "hero_eyebrow", label: "Sobretítulo", type: "text", default: "Linha MONTEZ Hotel 600" },
+      { key: "hero_title", label: "Título", type: "text", default: "A sensação de hotel." },
+      { key: "hero_title_2", label: "Título (linha 2)", type: "text", default: "No conforto da sua casa." },
+      {
+        key: "hero_subtitle",
+        label: "Texto",
+        type: "textarea",
+        default:
+          "Toalhas MONTEZ de 600 g/m² em 100% algodão e fio penteado, criadas para transformar o banho de todos os dias em uma experiência de conforto.",
+      },
+      { key: "hero_cta", label: "CTA principal", type: "text", default: "Conheça a coleção" },
+      { key: "hero_cta_href", label: "Link do CTA principal", type: "text", default: "/kits" },
+      { key: "hero_cta_secondary", label: "CTA secundário", type: "text", default: "Ver kits" },
+      { key: "hero_cta_secondary_href", label: "Link do CTA secundário", type: "text", default: "/#kits" },
+      { key: "hero_text_position", label: "Posição do texto", type: "select", options: ["left", "center", "right"], default: "left" },
+      { key: "hero_image_desktop", label: "Imagem desktop", type: "image", default: "" },
+      { key: "hero_image_mobile", label: "Imagem mobile", type: "image", default: "" },
+      { key: "hero_image_alt", label: "Texto alternativo da imagem", type: "text", default: "Toalhas MONTEZ dobradas em um banheiro claro" },
+    ],
+  },
+  {
+    id: "benefits",
+    title: "Benefícios",
+    fields: [
+      { key: "benefit_1_title", label: "Card 1 — título", type: "text", default: "600 g/m²" },
+      { key: "benefit_1_text", label: "Card 1 — texto", type: "text", default: "Toalhas encorpadas e confortáveis." },
+      { key: "benefit_2_title", label: "Card 2 — título", type: "text", default: "100% algodão" },
+      { key: "benefit_2_text", label: "Card 2 — texto", type: "text", default: "Fibra natural para uma experiência agradável." },
+      { key: "benefit_3_title", label: "Card 3 — título", type: "text", default: "Fio penteado" },
+      { key: "benefit_3_text", label: "Card 3 — texto", type: "text", default: "Acabamento pensado para um toque refinado." },
+      { key: "benefit_4_title", label: "Card 4 — título", type: "text", default: "Coleção MONTEZ" },
+      { key: "benefit_4_text", label: "Card 4 — texto", type: "text", default: "Cores escolhidas para diferentes estilos de banheiro." },
+    ],
+  },
+  {
+    id: "kits",
+    title: "Bloco de kits",
+    fields: [
+      { key: "kits_title", label: "Título", type: "text", default: "Escolha sua experiência MONTEZ" },
+      {
+        key: "kits_subtitle",
+        label: "Subtítulo",
+        type: "textarea",
+        default: "Kits completos com toalhas de banho, rosto e piso da linha Hotel 600. Escolha a cor, o tamanho do kit e pronto.",
+      },
+    ],
+  },
+  {
+    id: "colors",
+    title: "Bloco de cores",
+    fields: [
+      { key: "colors_title", label: "Título", type: "text", default: "Dez cores. Um mesmo padrão de conforto." },
+      {
+        key: "colors_subtitle",
+        label: "Subtítulo",
+        type: "textarea",
+        default: "Tons atemporais para compor banheiros claros, escuros, naturais ou contemporâneos.",
+      },
+    ],
+  },
+  {
+    id: "experience",
+    title: "Bloco de experiência",
+    fields: [
+      { key: "experience_title", label: "Título", type: "text", default: "Você sente a diferença no primeiro toque." },
+      {
+        key: "experience_text",
+        label: "Texto",
+        type: "textarea",
+        default:
+          "Felpa densa, peso generoso e acabamento cuidadoso. Cada toalha MONTEZ é pensada para secar bem, ter toque macio e manter a presença no seu banheiro.",
+      },
+      { key: "experience_image", label: "Imagem (macro da textura)", type: "image", default: "" },
+      { key: "experience_point_1", label: "Ponto 1", type: "text", default: "Textura — felpa encorpada e uniforme" },
+      { key: "experience_point_2", label: "Ponto 2", type: "text", default: "Espessura — 600 g/m² nas toalhas de banho e rosto" },
+      { key: "experience_point_3", label: "Ponto 3", type: "text", default: "Acabamento — barra tecida e costuras reforçadas" },
+      { key: "experience_point_4", label: "Ponto 4", type: "text", default: "Identidade — etiqueta MONTEZ em cada peça" },
+    ],
+  },
+  {
+    id: "hotel",
+    title: "Bloco Hotel em casa",
+    fields: [
+      { key: "hotel_title", label: "Título", type: "text", default: "Seu banho merece outro nível de conforto." },
+      {
+        key: "hotel_text",
+        label: "Texto",
+        type: "textarea",
+        default:
+          "A MONTEZ nasceu para levar para dentro de casa aquela sensação especial encontrada em uma boa experiência de hotel.",
+      },
+      { key: "hotel_cta", label: "CTA", type: "text", default: "Conheça a MONTEZ" },
+      { key: "hotel_cta_href", label: "Link do CTA", type: "text", default: "/sobre" },
+      { key: "hotel_image", label: "Imagem lifestyle", type: "image", default: "" },
+    ],
+  },
+  {
+    id: "compare",
+    title: "Bloco comparativo",
+    fields: [
+      { key: "compare_title", label: "Título", type: "text", default: "O que define uma toalha MONTEZ" },
+      {
+        key: "compare_items",
+        label: "Itens (um por linha)",
+        type: "textarea",
+        default: "600 g/m² nas toalhas de banho e rosto\n100% algodão\nFio penteado\nSeleção de 10 cores\nKits completos para o banheiro",
+      },
+    ],
+  },
+  {
+    id: "choose",
+    title: "Bloco Qual kit escolher?",
+    fields: [{ key: "choose_title", label: "Título", type: "text", default: "Qual kit escolher?" }],
+  },
+  {
+    id: "reviews",
+    title: "Avaliações",
+    fields: [{ key: "reviews_title", label: "Título", type: "text", default: "Quem já tem MONTEZ em casa" }],
+  },
+  {
+    id: "trust",
+    title: "Selos de confiança (fatos reais)",
+    fields: [
+      { key: "trust_1", label: "Item 1", type: "text", default: "Pagamento via PIX com confirmação automática" },
+      { key: "trust_2", label: "Item 2", type: "text", default: "Dados protegidos e checkout seguro" },
+      { key: "trust_3", label: "Item 3", type: "text", default: "7 dias para arrependimento, conforme o CDC" },
+      { key: "trust_4", label: "Item 4", type: "text", default: "Atendimento humano pelos nossos canais" },
+    ],
+  },
+  {
+    id: "final",
+    title: "CTA final",
+    fields: [
+      { key: "final_title", label: "Título", type: "text", default: "Transforme o banho de todos os dias." },
+      { key: "final_text", label: "Texto", type: "text", default: "Escolha seu kit MONTEZ e a cor que combina com o seu banheiro." },
+      { key: "final_cta", label: "CTA", type: "text", default: "Escolher meu kit" },
+      { key: "final_image", label: "Imagem de fundo", type: "image", default: "" },
+    ],
+  },
+  {
+    id: "footer",
+    title: "Rodapé",
+    fields: [
+      { key: "footer_tagline", label: "Assinatura", type: "text", default: "Hotel Collection" },
+      {
+        key: "footer_text",
+        label: "Texto institucional",
+        type: "textarea",
+        default: "Toalhas de 600 g/m² em 100% algodão e fio penteado. A sensação de hotel, no conforto da sua casa.",
+      },
+    ],
+  },
+  {
+    id: "checkout",
+    title: "Checkout e PIX",
+    fields: [
+      { key: "checkout_note", label: "Nota no checkout", type: "text", default: "Pagamento 100% via PIX, com confirmação automática." },
+      { key: "pix_title", label: "Título da página PIX", type: "text", default: "Seu PIX está pronto." },
+      {
+        key: "pix_note",
+        label: "Mensagem da página PIX",
+        type: "text",
+        default: "Após realizar o pagamento, esta página será atualizada automaticamente.",
+      },
+      { key: "success_title", label: "Título de sucesso", type: "text", default: "Pedido confirmado!" },
+      { key: "success_text", label: "Mensagem de sucesso", type: "text", default: "Obrigado por escolher a MONTEZ." },
+    ],
+  },
+  {
+    id: "pages",
+    title: "Páginas institucionais",
+    description: "Textos em formato simples: parágrafos separados por linha em branco; linhas iniciadas com ## viram subtítulos.",
+    fields: [
+      { key: "page_sobre", label: "Sobre", type: "textarea", default: "" },
+      { key: "page_cuidados", label: "Cuidados", type: "textarea", default: "" },
+      { key: "page_privacidade", label: "Política de privacidade", type: "textarea", default: "" },
+      { key: "page_termos", label: "Termos de uso", type: "textarea", default: "" },
+      { key: "page_trocas", label: "Trocas e devoluções", type: "textarea", default: "" },
+    ],
+  },
+];
+
+export const CONTENT_DEFAULTS: Record<string, string> = Object.fromEntries(
+  CONTENT_GROUPS.flatMap((g) => g.fields.map((f) => [f.key, f.default]))
+);
+
+export type SettingField = {
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "money" | "boolean" | "image";
+  help?: string;
+  default: string;
+  group: string;
+};
+
+export const SETTING_FIELDS: SettingField[] = [
+  { group: "Loja", key: "store_name", label: "Nome da loja", type: "text", default: "MONTEZ" },
+  { group: "Loja", key: "store_legal_name", label: "Razão social", type: "text", default: "" },
+  { group: "Loja", key: "store_cnpj", label: "CNPJ", type: "text", default: "", help: "Exibido no rodapé quando preenchido." },
+  { group: "Loja", key: "store_logo", label: "Logo (opcional — padrão é o logotipo tipográfico)", type: "image", default: "" },
+  { group: "Loja", key: "store_favicon", label: "Favicon (URL)", type: "image", default: "" },
+  { group: "Contato", key: "contact_email", label: "E-mail de atendimento", type: "text", default: "" },
+  { group: "Contato", key: "contact_whatsapp", label: "WhatsApp (somente números, com DDD)", type: "text", default: "" },
+  { group: "Contato", key: "contact_instagram", label: "Instagram (@usuario)", type: "text", default: "" },
+  { group: "Contato", key: "contact_address", label: "Endereço", type: "textarea", default: "" },
+  { group: "Contato", key: "contact_hours", label: "Horário de atendimento", type: "text", default: "" },
+  { group: "Pedidos", key: "shipping_flat_cents", label: "Frete fixo (R$)", type: "money", default: "0", help: "0 = frete grátis." },
+  { group: "Pedidos", key: "shipping_note", label: "Texto sobre envio", type: "text", default: "Enviamos para todo o Brasil. O código de rastreio é enviado por e-mail." },
+  { group: "Pagamento", key: "pix_expiration_minutes", label: "Validade do PIX (minutos)", type: "number", default: "60" },
+  { group: "E-mail", key: "recovery_delay_minutes", label: "Recuperação de PIX após (minutos)", type: "number", default: "15" },
+  { group: "E-mail", key: "confirmation_delay_minutes", label: "E-mail de confirmação após pagamento (minutos)", type: "number", default: "15" },
+  { group: "E-mail", key: "recovery_enabled", label: "Enviar e-mail de recuperação de PIX", type: "boolean", default: "true" },
+  { group: "E-mail", key: "confirmation_enabled", label: "Enviar e-mail de confirmação", type: "boolean", default: "true" },
+  { group: "SEO", key: "seo_title", label: "Título padrão", type: "text", default: "MONTEZ | Toalhas 600 g/m² 100% algodão — A sensação de hotel em casa" },
+  {
+    group: "SEO",
+    key: "seo_description",
+    label: "Descrição padrão",
+    type: "textarea",
+    default: "Kits de toalhas MONTEZ Hotel 600: 600 g/m², 100% algodão e fio penteado, em 10 cores. Compre com PIX e confirmação automática.",
+  },
+  { group: "SEO", key: "seo_og_image", label: "Imagem de compartilhamento (Open Graph)", type: "image", default: "" },
+  { group: "Tracking", key: "tracking_meta_enabled", label: "Meta Pixel/CAPI ativos", type: "boolean", default: "true", help: "Os IDs ficam em variáveis de ambiente." },
+  { group: "Tracking", key: "tracking_ga_enabled", label: "Google Analytics ativo", type: "boolean", default: "true" },
+];
+
+export const SETTING_DEFAULTS: Record<string, string> = Object.fromEntries(SETTING_FIELDS.map((f) => [f.key, f.default]));

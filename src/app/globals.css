@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ivory text-graphite font-sans antialiased;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+  .font-serif {
+    font-variant-numeric: lining-nums;
+  }
+  h1, h2, h3, .font-display {
+    @apply font-serif;
+    font-variant-numeric: lining-nums;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    @apply bg-sand text-ink;
+  }
+  :focus-visible {
+    outline: 2px solid #4B5637;
+    outline-offset: 2px;
+  }
+  input, select, textarea, button {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-label text-taupe-dark;
+  }
+  .btn {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full px-7 text-[13px] font-semibold uppercase tracking-[0.12em] transition duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-ivory hover:bg-graphite active:scale-[0.99];
+  }
+  .btn-olive {
+    @apply btn bg-olive text-ivory hover:bg-olive-dark active:scale-[0.99];
+  }
+  .btn-light {
+    @apply btn bg-ivory text-ink hover:bg-white;
+  }
+  .btn-outline {
+    @apply btn border border-graphite/25 bg-transparent text-ink hover:border-ink hover:bg-ink hover:text-ivory;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-white/70 shadow-card;
+  }
+  .input {
+    @apply block w-full rounded-xl border border-line bg-white px-4 text-[16px] text-ink placeholder:text-taupe/70 transition focus:border-graphite focus:outline-none focus:ring-2 focus:ring-olive/15;
+    min-height: 50px;
+  }
+  .input-error {
+    @apply border-red-400 focus:border-red-500 focus:ring-red-100;
+  }
+  .label {
+    @apply mb-1.5 block text-[12px] font-medium uppercase tracking-[0.1em] text-taupe-dark;
+  }
+  .section {
+    @apply py-16 md:py-24;
+  }
+  .section-title {
+    @apply font-serif text-[30px] leading-[1.1] text-ink md:text-[44px];
+  }
+  .prose-montez h2 {
+    @apply mb-3 mt-10 font-serif text-2xl text-ink;
+  }
+  .prose-montez p {
+    @apply mb-4 leading-7 text-graphite/85;
+  }
+  .prose-montez ul {
+    @apply mb-4 list-disc space-y-1.5 pl-5 text-graphite/85;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  .bg-linen-texture {
+    background-color: #f4eee5;
+    background-image: radial-gradient(rgba(46, 43, 40, 0.035) 1px, transparent 1px);
+    background-size: 5px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Admin: visual SaaS neutro, sem a serif da loja */
+.admin-ui h1,
+.admin-ui h2,
+.admin-ui h3 {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: normal;
+}
