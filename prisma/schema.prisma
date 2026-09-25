@@ -1,0 +1,603 @@
+// MONTEZ — schema PostgreSQL
+// Valores monetários sempre em centavos (Int).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// ───────────────────────── Admin / auth ─────────────────────────
+
+enum AdminRole {
+  OWNER
+  ADMIN
+  EDITOR
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  passwordHash String
+  role         AdminRole      @default(ADMIN)
+  active       Boolean        @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  auditLogs    AuditLog[]
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  @@index([adminId])
+}
+
+/// Tentativas de login para proteção contra brute force (persistente entre instâncias serverless).
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model AuditLog {
+  id        String     @id @default(cuid())
+  adminId   String?
+  admin     AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String?
+  entityId  String?
+  details   Json?
+  ipHash    String?
+  createdAt DateTime   @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+// ───────────────────────── Catálogo ─────────────────────────
+
+model Color {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  internalName   String
+  commercialName String
+  hex            String
+  swatchUrl      String?
+  active         Boolean          @default(true)
+  sortOrder      Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  variants       ProductVariant[]
+  images         ProductImage[]
+}
+
+enum ProductKind {
+  KIT
+  PIECE
+}
+
+model Product {
+  id                  String           @id @default(cuid())
+  slug                String           @unique
+  sku                 String           @unique
+  kind                ProductKind      @default(KIT)
+  name                String
+  commercialName      String
+  subtitle            String?
+  shortDescription    String?
+  description         String?
+  tagline             String?
+  badge               String?
+  priceCents          Int
+  compareAtPriceCents Int?
+  pieceCount          Int
+  /// Lista de peças do kit: [{ type, label, quantity, dimensions, weight, composition }]
+  pieces              Json             @default("[]")
+  /// Especificações livres exibidas na página: [{ label, value }]
+  specs               Json             @default("[]")
+  composition         String?
+  weight              String?
+  dimensions          String?
+  stockQuantity       Int              @default(0)
+  allowBackorder      Boolean          @default(true)
+  lowStockThreshold   Int              @default(5)
+  featured            Boolean          @default(false)
+  active              Boolean          @default(true)
+  sortOrder           Int              @default(0)
+  seoTitle            String?
+  seoDescription      String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  variants            ProductVariant[]
+  images              ProductImage[]
+  orderItems          OrderItem[]
+  reviews             Review[]
+}
+
+model ProductVariant {
+  id            String      @id @default(cuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  colorId       String
+  color         Color       @relation(fields: [colorId], references: [id], onDelete: Restrict)
+  sku           String      @unique
+  stockQuantity Int         @default(0)
+  active        Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
+
+  @@unique([productId, colorId])
+}
+
+enum MediaDevice {
+  ALL
+  DESKTOP
+  MOBILE
+}
+
+model ProductImage {
+  id        String      @id @default(cuid())
+  productId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaAsset  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  colorId   String?
+  color     Color?      @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  device    MediaDevice @default(ALL)
+  sortOrder Int         @default(0)
+
+  @@index([productId, colorId])
+}
+
+enum MediaCategory {
+  HERO
+  PRODUTO
+  COLECAO
+  LIFESTYLE
+  BENEFICIOS
+  FAQ
+  DEPOIMENTOS
+  BANNER
+  CHECKOUT
+  OUTROS
+}
+
+model MediaAsset {
+  id            String         @id @default(cuid())
+  name          String
+  url           String
+  pathname      String?
+  alt           String         @default("")
+  category      MediaCategory  @default(OUTROS)
+  page          String?
+  section       String?
+  device        MediaDevice    @default(ALL)
+  mimeType      String?
+  size          Int?
+  width         Int?
+  height        Int?
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  productImages ProductImage[]
+
+  @@index([category])
+}
+
+// ───────────────────────── Clientes / pedidos ─────────────────────────
+
+model Customer {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  cpf       String
+  phone     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  addresses Address[]
+  orders    Order[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  cep        String
+  street     String
+  number     String
+  complement String?
+  district   String
+  city       String
+  state      String
+  createdAt  DateTime @default(now())
+  orders     Order[]
+
+  @@index([customerId])
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  EXPIRED
+  CANCELLED
+  REFUNDED
+  CHARGEBACK
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  EXPIRED
+  REFUNDED
+  CHARGEBACK
+  FAILED
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  PREPARING
+  SHIPPED
+  DELIVERED
+}
+
+enum OrderSource {
+  STOREFRONT
+  UPSELL
+}
+
+model Order {
+  id                    String            @id @default(cuid())
+  seq                   Int               @unique @default(autoincrement())
+  orderNumber           String?           @unique
+  source                OrderSource       @default(STOREFRONT)
+  parentOrderId         String?
+  parentOrder           Order?            @relation("OrderUpsells", fields: [parentOrderId], references: [id], onDelete: SetNull)
+  upsellOrders          Order[]           @relation("OrderUpsells")
+  customerId            String
+  customer              Customer          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  addressId             String?
+  address               Address?          @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  /// Snapshot do endereço no momento da compra
+  shippingAddress       Json
+  status                OrderStatus       @default(PENDING_PAYMENT)
+  paymentStatus         PaymentStatus     @default(PENDING)
+  fulfillmentStatus     FulfillmentStatus @default(UNFULFILLED)
+  trackingCode          String?
+  subtotalCents         Int
+  discountCents         Int               @default(0)
+  shippingCents         Int               @default(0)
+  totalCents            Int
+  feeCents              Int?
+  netCents              Int?
+  paymentMethod         String            @default("PIX")
+  paymentProvider       String            @default("bravopay")
+  bravopayTransactionId String?           @unique
+  externalReference     String?           @unique
+  pixCopyPaste          String?
+  pixExpiresAt          DateTime?
+  paymentError          String?
+  /// Chave de idempotência gerada no navegador: impede pedido duplicado em duplo clique
+  checkoutToken         String?           @unique
+  /// Token secreto para acessar/retomar o pedido por link (e-mail, página PIX)
+  accessToken           String            @unique
+  metaEventId           String?
+  // Atribuição — last touch (campos principais) + first touch
+  utmSource             String?
+  utmMedium             String?
+  utmCampaign           String?
+  utmContent            String?
+  utmTerm               String?
+  firstTouchSource      String?
+  firstTouchMedium      String?
+  firstTouchCampaign    String?
+  firstTouchContent     String?
+  firstTouchTerm        String?
+  lastTouchSource       String?
+  lastTouchMedium       String?
+  lastTouchCampaign     String?
+  lastTouchContent      String?
+  lastTouchTerm         String?
+  fbclid                String?
+  gclid                 String?
+  ttclid                String?
+  fbp                   String?
+  fbc                   String?
+  landingPage           String?
+  referrer              String?
+  sessionId             String?
+  visitorId             String?
+  userAgent             String?
+  ipHash                String?
+  channel               String?
+  // Ciclo de vida
+  paidAt                DateTime?
+  expiredAt             DateTime?
+  cancelledAt           DateTime?
+  lastCheckedAt         DateTime?
+  purchaseTrackedAt     DateTime?
+  stockCommittedAt      DateTime?
+  deletedAt             DateTime?
+  deletedBy             String?
+  deleteReason          String?
+  notes                 String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  items                 OrderItem[]
+  payments              Payment[]
+  paymentEvents         PaymentEvent[]
+  emailEvents           EmailEvent[]
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@index([customerId])
+  @@index([deletedAt])
+}
+
+enum OrderItemKind {
+  PRODUCT
+  ORDER_BUMP
+  UPSELL
+}
+
+model OrderItem {
+  id                  String          @id @default(cuid())
+  orderId             String
+  order               Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kind                OrderItemKind   @default(PRODUCT)
+  productId           String?
+  product             Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId           String?
+  variant             ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productNameSnapshot String
+  sku                 String
+  variantLabel        String?
+  colorName           String?
+  colorHex            String?
+  quantity            Int
+  unitPriceCents      Int
+  totalPriceCents     Int
+  metadata            Json?
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider      String        @default("bravopay")
+  transactionId String        @unique
+  method        String        @default("PIX")
+  status        PaymentStatus @default(PENDING)
+  amountCents   Int
+  feeCents      Int?
+  netCents      Int?
+  paidAt        DateTime?
+  raw           Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([orderId])
+}
+
+/// Histórico de eventos do pedido/pagamento (requisições, respostas, webhooks, polling, mudanças de status).
+model PaymentEvent {
+  id        String   @id @default(cuid())
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String
+  status    String?
+  message   String?
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
+model WebhookEvent {
+  id          String        @id @default(cuid())
+  provider    String        @default("bravopay")
+  eventId     String        @unique
+  eventType   String
+  status      WebhookStatus @default(RECEIVED)
+  payloadHash String
+  payload     Json
+  error       String?
+  receivedAt  DateTime      @default(now())
+  processedAt DateTime?
+
+  @@index([receivedAt])
+}
+
+// ───────────────────────── E-mails ─────────────────────────
+
+enum EmailType {
+  PURCHASE_CONFIRMATION
+  PIX_RECOVERY
+  ORDER_STATUS
+  MANUAL
+}
+
+enum EmailStatus {
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+  SKIPPED
+}
+
+model EmailEvent {
+  id                String      @id @default(cuid())
+  orderId           String?
+  order             Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type              EmailType
+  status            EmailStatus @default(SCHEDULED)
+  toEmail           String
+  subject           String?
+  scheduledFor      DateTime    @default(now())
+  sentAt            DateTime?
+  attempts          Int         @default(0)
+  providerMessageId String?
+  error             String?
+  triggeredBy       String?
+  reason            String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([status, scheduledFor])
+  @@index([orderId])
+}
+
+// ───────────────────────── Analytics ─────────────────────────
+
+model AnalyticsSession {
+  id              String           @id
+  visitorId       String
+  customerId      String?
+  firstSeenAt     DateTime         @default(now())
+  lastSeenAt      DateTime         @default(now())
+  landingPage     String?
+  exitPage        String?
+  referrer        String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  utmContent      String?
+  utmTerm         String?
+  fbclid          String?
+  gclid           String?
+  ttclid          String?
+  channel         String?
+  device          String?
+  browser         String?
+  os              String?
+  pageViews       Int              @default(0)
+  events          AnalyticsEvent[]
+
+  @@index([firstSeenAt])
+  @@index([lastSeenAt])
+  @@index([visitorId])
+}
+
+model AnalyticsEvent {
+  id         String           @id @default(cuid())
+  sessionId  String
+  session    AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  visitorId  String
+  name       String
+  path       String?
+  productId  String?
+  orderId    String?
+  valueCents Int?
+  props      Json?
+  createdAt  DateTime         @default(now())
+
+  @@index([name, createdAt])
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+// ───────────────────────── CMS / ofertas ─────────────────────────
+
+model SiteContent {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  city      String?
+  rating    Int
+  title     String?
+  body      String
+  photoUrl  String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderBump {
+  id          String   @id @default(cuid())
+  sku         String   @unique
+  title       String
+  description String?
+  priceCents  Int
+  imageUrl    String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Upsell {
+  id          String   @id @default(cuid())
+  sku         String   @unique
+  headline    String
+  title       String
+  description String?
+  priceCents  Int
+  imageUrl    String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Trava simples para jobs (evita duas execuções simultâneas do mesmo processador).
+model JobLock {
+  name      String   @id
+  lockedAt  DateTime
+  expiresAt DateTime
+}
