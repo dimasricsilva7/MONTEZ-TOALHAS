@@ -3,6 +3,7 @@ import { checkoutSchema } from "@/lib/validation";
 import { rateLimit } from "@/lib/rate-limit";
 import { getClientIp, isSameOrigin } from "@/lib/request";
 import { CheckoutError, createCheckoutOrder } from "@/server/orders";
+import { bravopayMode } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,12 @@ export async function POST(req: NextRequest) {
   const ip = getClientIp(req.headers);
   if (!rateLimit(`checkout:${ip}`, 8, 10 * 60_000)) {
     return NextResponse.json({ error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." }, { status: 429 });
+  }
+
+  // Sem gateway configurado não criamos pedidos que nunca poderiam ser pagos.
+  if (bravopayMode() === "disabled") {
+    console.error("[checkout] BravoPay não configurada (BRAVOPAY_API_KEY ausente)");
+    return NextResponse.json({ error: "Pagamentos temporariamente indisponíveis. Tente novamente em alguns minutos." }, { status: 503 });
   }
 
   const json = await req.json().catch(() => null);

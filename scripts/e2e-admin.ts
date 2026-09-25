@@ -88,7 +88,7 @@ async function pageOk(page: Page, path: string) {
   await page.click("button:has-text('Salvar')");
   await page.waitForSelector("form [role=status]", { timeout: 30000 });
   const store = await ctx.newPage();
-  await store.goto(BASE + "/", { waitUntil: "networkidle" });
+  await store.goto(`${BASE}/?e2e=${Date.now()}`, { waitUntil: "networkidle" });
   check(((await store.textContent("body")) ?? "").includes(marker), "alteração de conteúdo aparece na loja");
   await page.click("button:has-text('Restaurar padrão')").catch(() => {});
   page.once("dialog", (d) => d.accept());

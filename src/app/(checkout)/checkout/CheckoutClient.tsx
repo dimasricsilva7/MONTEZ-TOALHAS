@@ -379,8 +379,8 @@ export function CheckoutClient({ shippingCents, bumps, note }: { shippingCents: 
                 <button type="button" className="btn-olive mt-6 w-full !min-h-[56px] text-[14px]" onClick={submit} disabled={submitting}>
                   {submitting ? "Gerando seu PIX…" : `Gerar PIX — ${formatBRL(totalCents)}`}
                 </button>
-                <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[12px] text-taupe-dark">
-                  <IconShield size={14} /> Ao continuar, você concorda com os <Link href="/termos" className="underline">termos</Link> e a <Link href="/politica-de-privacidade" className="underline">política de privacidade</Link>.
+                <p className="mt-3 text-center text-[12px] leading-5 text-taupe-dark">
+                  <IconShield size={14} className="mr-1 inline align-[-2px]" /> Ao continuar, você concorda com os <Link href="/termos" className="underline">termos</Link> e a <Link href="/politica-de-privacidade" className="underline">política de privacidade</Link>.
                 </p>
               </div>
             )}
