@@ -338,3 +338,95 @@ export function FinalCta({ c }: { c: C }) {
     </section>
   );
 }
+
+export function Moments({ c }: { c: C }) {
+  if (c.moments_enabled === "false") return null;
+  const items = [1, 2, 3].map((i) => ({ title: c[`moment_${i}_title`], text: c[`moment_${i}_text`] })).filter((m) => m.title);
+  if (!items.length) return null;
+  return (
+    <section className="section bg-cream" aria-labelledby="moments-title">
+      <div className="container">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <p className="eyebrow">Na sua rotina</p>
+          <h2 id="moments-title" className="section-title mt-3 text-balance">{c.moments_title}</h2>
+        </Reveal>
+        <div className={`mt-12 grid gap-5 ${c.moment_image ? "lg:grid-cols-[1.1fr_1fr]" : ""}`}>
+          {c.moment_image && (
+            <Reveal className="relative min-h-[320px] overflow-hidden rounded-[28px]">
+              <Image src={c.moment_image} alt="" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            </Reveal>
+          )}
+          <div className={`grid gap-5 ${c.moment_image ? "" : "md:grid-cols-3"}`}>
+            {items.map((m, i) => (
+              <Reveal key={i} delay={i * 90} className="rounded-[22px] border border-line bg-ivory p-7">
+                <span className="font-serif text-[40px] leading-none text-sand">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-4 font-serif text-[26px] leading-tight text-ink">{m.title}</h3>
+                <p className="mt-3 text-[15px] leading-7 text-graphite/80">{m.text}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function Gift({ c }: { c: C }) {
+  if (c.gift_enabled === "false" || !c.gift_title) return null;
+  return (
+    <section className="section" aria-labelledby="gift-title">
+      <div className="container">
+        <Reveal className="grid items-center gap-8 overflow-hidden rounded-[28px] bg-olive text-ivory md:grid-cols-[1.2fr_1fr]">
+          <div className="p-8 md:p-14">
+            <p className="eyebrow !text-ivory/70">Para presentear</p>
+            <h2 id="gift-title" className="mt-3 font-serif text-[32px] leading-[1.1] md:text-[44px]">{c.gift_title}</h2>
+            <p className="mt-4 max-w-md text-[15px] leading-7 text-ivory/85">{c.gift_text}</p>
+            <Link href="/#kits" className="btn-light mt-8" data-cta="gift_section">
+              {c.gift_cta} <IconArrow size={18} />
+            </Link>
+          </div>
+          <div className="relative h-64 md:h-full md:min-h-[360px]">
+            {c.gift_image ? (
+              <Image src={c.gift_image} alt="Kit MONTEZ para presente" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-olive-dark/40">
+                <div className="relative h-40 w-56 rounded-2xl border border-ivory/25 bg-ivory/10 shadow-lift">
+                  <div className="absolute inset-y-0 left-1/2 w-6 -translate-x-1/2 bg-sand/70" />
+                  <div className="absolute inset-x-0 top-1/2 h-6 -translate-y-1/2 bg-sand/70" />
+                  <span className="absolute bottom-3 left-4 font-serif text-[13px] tracking-[0.35em] text-ivory/90">MONTEZ</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+export function Guarantee({ c }: { c: C }) {
+  const items = [
+    { icon: IconTruck, text: c.guarantee_1 },
+    { icon: IconShield, text: c.guarantee_2 },
+    { icon: IconPix, text: c.guarantee_3 },
+    { icon: IconChat, text: c.guarantee_4 },
+  ].filter((i) => i.text);
+  if (!items.length) return null;
+  return (
+    <section className="border-y border-line bg-ivory" aria-labelledby="guarantee-title">
+      <div className="container py-12 md:py-16">
+        <h2 id="guarantee-title" className="text-center font-serif text-[28px] text-ink md:text-[34px]">{c.guarantee_title}</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((it, i) => (
+            <div key={i} className="flex items-start gap-3 rounded-2xl border border-line bg-white/70 p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-olive-light text-olive">
+                <it.icon size={20} />
+              </span>
+              <p className="text-[14px] leading-6 text-graphite/85">{it.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

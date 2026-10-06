@@ -2,7 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { ColorsSection } from "@/components/home/ColorsSection";
-import { Benefits, ChooseKit, Compare, Experience, FaqList, FinalCta, HotelSection, KitsSection, Reviews, TrustBar } from "@/components/home/Sections";
+import { Benefits, ChooseKit, Compare, Experience, FaqList, FinalCta, Gift, Guarantee, HotelSection, KitsSection, Moments, Reviews } from "@/components/home/Sections";
+import { HomeStickyCta } from "@/components/home/StickyCta";
+import { formatBRL } from "@/utils/format";
 import { getCatalog, getColors } from "@/server/catalog";
 import { getContent, getFaqs, getReviews, getSettings, isOn } from "@/server/content";
 
@@ -20,20 +22,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [c, products, colors, faqs, reviews] = await Promise.all([getContent(), getCatalog(), getColors(), getFaqs(), getReviews()]);
+  const [c, products, colors, faqs, reviews, settings] = await Promise.all([getContent(), getCatalog(), getColors(), getFaqs(), getReviews(), getSettings()]);
 
   return (
     <>
       {isOn(c.hero_enabled) && <Hero c={c} colors={colors} />}
       <Benefits c={c} />
       <KitsSection c={c} products={products} />
+      <Moments c={c} />
       <ColorsSection title={c.colors_title} subtitle={c.colors_subtitle} />
       <Experience c={c} />
-      <HotelSection c={c} />
       <Compare c={c} />
+      <HotelSection c={c} />
       <ChooseKit c={c} products={products} />
+      <Gift c={c} />
       <Reviews c={c} reviews={reviews} />
-      <TrustBar c={c} />
+      <Guarantee c={c} />
       {faqs.length > 0 && (
         <section className="section" aria-labelledby="faq-home-title">
           <div className="container grid gap-10 md:grid-cols-[1fr_2fr] md:gap-16">
@@ -49,6 +53,7 @@ export default async function HomePage() {
         </section>
       )}
       <FinalCta c={c} />
+      {products.length > 0 && <HomeStickyCta label="Escolher meu kit" fromPrice={formatBRL(Math.min(...products.map((p) => p.priceCents)))} freeShipping={!(Number(settings.shipping_flat_cents) > 0)} />}
     </>
   );
 }

@@ -13,7 +13,7 @@ export function ColorsSection({ title, subtitle }: { title: string; subtitle: st
   const color = colors.find((c) => c.id === selectedColorId) ?? colors.find((c) => c.slug === "areia") ?? colors[0];
 
   return (
-    <section className="section overflow-hidden" aria-labelledby="colors-title">
+    <section id="cores" className="section scroll-mt-20 overflow-hidden" aria-labelledby="colors-title">
       <div className="container">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">A coleção</p>

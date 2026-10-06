@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { Gallery } from "./Gallery";
 import { QtyStepper } from "@/components/cart/CartContents";
-import { IconArrow, IconPix, IconShield, IconTruck } from "@/components/icons";
+import { IconArrow, IconCheck, IconPix, IconShield, IconTruck } from "@/components/icons";
 import type { CatalogProduct } from "@/types/catalog";
 import { formatBRL } from "@/utils/format";
 import { gaEvent, metaEvent } from "@/lib/client/tracking";
@@ -107,7 +107,7 @@ export function ProductDetail({ product, shippingNote }: { product: CatalogProdu
             <div className="mt-7 flex gap-3">
               <QtyStepper value={qty} onChange={setQty} />
               <button className="btn-olive flex-1" onClick={buyNow} disabled={unavailable || !color} data-cta="product_buy_now">
-                {unavailable ? "Indisponível nesta cor" : "Comprar agora"} {!unavailable && <IconArrow size={18} />}
+                {unavailable ? "Indisponível nesta cor" : "Quero o meu kit"} {!unavailable && <IconArrow size={18} />}
               </button>
             </div>
             <button className="btn-outline mt-3 w-full" onClick={() => color && add(product.id, color.id, qty)} disabled={unavailable || !color} data-cta="product_add_to_cart">
@@ -125,6 +125,17 @@ export function ProductDetail({ product, shippingNote }: { product: CatalogProdu
                 <IconTruck size={18} className="text-olive" /> {shippingNote}
               </li>
             </ul>
+          </div>
+
+          <div className="mt-8 rounded-2xl bg-cream/70 p-5">
+            <p className="font-serif text-[22px] text-ink">Por que você vai amar</p>
+            <ul className="mt-3 space-y-2.5 text-[14.5px] leading-6 text-graphite/85">
+              <li className="flex gap-2.5"><IconCheck size={18} className="mt-0.5 shrink-0 text-olive" /> Aquela sensação de sair do banho e se enrolar numa toalha grossa, macia e que seca de verdade.</li>
+              <li className="flex gap-2.5"><IconCheck size={18} className="mt-0.5 shrink-0 text-olive" /> Todas as peças na mesma cor: o banheiro fica coordenado, com cara de hotel.</li>
+              <li className="flex gap-2.5"><IconCheck size={18} className="mt-0.5 shrink-0 text-olive" /> 600 g/m² de algodão penteado nas toalhas de banho e rosto — peso que você sente na mão.</li>
+              <li className="flex gap-2.5"><IconCheck size={18} className="mt-0.5 shrink-0 text-olive" /> Um presente bonito de abrir e gostoso de usar todos os dias.</li>
+            </ul>
+            <p className="mt-4 text-[12.5px] text-taupe-dark">Não amou? Você tem 7 dias após o recebimento para devolver.</p>
           </div>
 
           <div className="mt-10">
@@ -184,7 +195,7 @@ export function ProductDetail({ product, shippingNote }: { product: CatalogProdu
       {/* CTA fixo no mobile */}
       <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ivory/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur transition-transform duration-300 md:hidden ${showSticky ? "translate-y-0" : "translate-y-full"}`}>
         <button className="btn-olive w-full" onClick={buyNow} disabled={unavailable || !color} data-cta="product_sticky_buy">
-          Comprar agora — {formatBRL(product.priceCents * qty)}
+          Quero o meu — {formatBRL(product.priceCents * qty)}
         </button>
       </div>
     </>

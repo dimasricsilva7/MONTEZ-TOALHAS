@@ -29,6 +29,7 @@ export function Hero({ c, colors }: Props) {
           </Link>
         )}
       </div>
+      {c.hero_reassurance && <p className={`mt-4 text-[12.5px] font-medium tracking-wide ${onImage ? "text-ivory/80" : "text-taupe-dark"}`}>{c.hero_reassurance}</p>}
     </div>
   );
 

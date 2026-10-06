@@ -29,6 +29,7 @@ export function KitCard({ product, priority, defaultColorSlug }: { product: Cata
         <p className="eyebrow">{product.name}</p>
         <h3 className="mt-1.5 font-serif text-[27px] leading-tight text-ink">{product.commercialName}</h3>
         <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-taupe">{product.pieceCount} peças</p>
+        {product.tagline && <p className="mt-2 font-serif text-[16px] italic text-graphite/80">{product.tagline}</p>}
         <ProductVisual product={product} color={color} className="mx-auto mt-4 aspect-[5/4] w-full rounded-2xl" priority={priority} />
       </Link>
 
@@ -67,7 +68,7 @@ export function KitCard({ product, priority, defaultColorSlug }: { product: Cata
           </p>
           <p className="mt-1 text-[12px] text-taupe-dark">à vista no PIX</p>
           <Link href={href} className={`${highlight ? "btn-olive" : "btn-primary"} mt-5 w-full`} data-cta={`kit_card_${product.slug}`}>
-            Escolher kit
+            Quero este kit
           </Link>
         </div>
       </div>
