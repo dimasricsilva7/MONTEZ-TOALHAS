@@ -6,6 +6,7 @@ import { ensureSession, trackEvent, trackPageView, TRACKED_EVENTS } from "@/lib/
 import { sendCapiEvent, type CapiEventName } from "@/lib/meta/capi";
 import { clientContextSchema } from "@/lib/validation";
 import { parseUserAgent } from "@/utils/channel";
+import { maybeRunJobsOpportunistically } from "@/server/jobs";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
         }
       });
     }
+    after(() => maybeRunJobsOpportunistically());
   } catch (err) {
     console.error("[track] erro", err instanceof Error ? err.message : err);
   }

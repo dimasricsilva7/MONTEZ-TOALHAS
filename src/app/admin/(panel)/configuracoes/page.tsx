@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
@@ -59,7 +60,7 @@ export default async function SettingsPage() {
 
         <Card title="Integrações e variáveis de ambiente">
           <p className="mb-3 text-sm text-slate-600">
-            Segredos ficam apenas nas variáveis de ambiente da Vercel (nunca no código). Aqui é mostrada só a presença de cada uma.
+            Segredos ficam apenas nas variáveis de ambiente da Vercel (nunca no código). Aqui é mostrada só a presença de cada uma. Para o teste ao vivo de cada conexão, abra <Link href="/admin/integracoes" className="font-semibold underline">Integrações</Link>.
           </p>
           <ul className="divide-y divide-slate-100 text-sm">
             {health.map((h) => (

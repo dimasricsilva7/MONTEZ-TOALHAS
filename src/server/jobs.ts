@@ -50,17 +50,37 @@ export async function runAllJobs() {
   return { ms: Date.now() - started, reconcile, emails, cleanup };
 }
 
+/** Permite uma execução a cada `intervalMs` no total (entre todas as instâncias), via banco. */
+async function claimSlot(name: string, intervalMs: number) {
+  const now = new Date();
+  const until = new Date(now.getTime() + intervalMs);
+  const taken = await db.$executeRaw`
+    INSERT INTO "JobLock" ("name", "lockedAt", "expiresAt") VALUES (${name}, ${now}, ${until})
+    ON CONFLICT ("name") DO UPDATE SET "lockedAt" = EXCLUDED."lockedAt", "expiresAt" = EXCLUDED."expiresAt"
+    WHERE "JobLock"."expiresAt" < ${now}`;
+  return taken > 0;
+}
+
 let lastOpportunistic = 0;
 /**
- * Execução oportunista dos jobs de e-mail a partir do tráfego (via after()),
- * no máximo 1x/min por instância. Complementa o cron externo — nunca é a única garantia.
+ * Execução a partir do próprio tráfego do site (via after()): reconcilia PIX
+ * pendentes com a BravoPay e envia e-mails vencidos. No máximo 1x/min no total.
+ * Garante confirmações mesmo sem webhook e com o agendador do GitHub atrasado.
  */
 export async function maybeRunJobsOpportunistically() {
-  if (Date.now() - lastOpportunistic < 60_000) return;
+  if (Date.now() - lastOpportunistic < 20_000) return; // filtro barato por instância
   lastOpportunistic = Date.now();
   try {
-    await runEmailJobs();
+    if (!(await claimSlot("tick", 60_000))) return;
+    await reconcilePendingOrders(10);
+    await processDueEmails(20);
   } catch (err) {
     console.error("[jobs] execução oportunista falhou", err instanceof Error ? err.message : err);
   }
+}
+
+/** Para agendadores externos (ex.: cron-job.org a cada 1 min): mesmo trabalho, mesmo limite global. */
+export async function runTick() {
+  if (!(await claimSlot("tick", 45_000))) return { skipped: true };
+  return { reconcile: await reconcilePendingOrders(15), emails: await processDueEmails(25) };
 }

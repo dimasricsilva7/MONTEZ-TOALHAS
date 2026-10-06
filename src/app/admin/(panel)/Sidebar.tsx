@@ -19,6 +19,7 @@ const NAV = [
   { href: "/admin/emails", label: "E-mails" },
   { href: "/admin/order-bumps", label: "Order Bumps" },
   { href: "/admin/upsells", label: "Upsells" },
+  { href: "/admin/integracoes", label: "Integrações" },
   { href: "/admin/configuracoes", label: "Configurações" },
   { href: "/admin/auditoria", label: "Auditoria" },
 ];
