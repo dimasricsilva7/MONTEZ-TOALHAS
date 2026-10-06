@@ -13,7 +13,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://viacep.com.br https://www.facebook.com https://connect.facebook.net https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.public.blob.vercel-storage.com https://vercel.com",
+  // https: — o Meta Pixel envia sinais para domínios dinâmicos (ex.: *.on.aws, *.run.app)
+  "connect-src 'self' https:",
   "frame-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
