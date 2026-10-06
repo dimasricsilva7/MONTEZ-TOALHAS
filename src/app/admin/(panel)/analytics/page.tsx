@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Card, PageHeader, Stat } from "@/components/admin/ui";
 import { HBars } from "@/components/admin/charts";
 import { PeriodFilter } from "@/components/admin/PeriodFilter";
+import { OnlineNow } from "@/components/admin/OnlineNow";
 import { analyticsOverview, funnel, parsePeriod, trafficSources, utmSources } from "@/server/admin/stats";
 import { formatBRL } from "@/utils/format";
 
@@ -48,6 +49,10 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader title="Analytics" description={`${p.label} · tracking próprio (sem dependência de terceiros)`} actions={<Suspense><PeriodFilter current={p.key} from={p.fromStr} to={p.toStr} /></Suspense>} />
+
+      <div className="mb-6">
+        <OnlineNow detailed />
+      </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Stat label="Agora (5 min)" value={String(a.realtime)} hint="sessões ativas" />

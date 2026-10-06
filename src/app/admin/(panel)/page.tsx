@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { Badge, Card, ORDER_TONE, PageHeader, Stat } from "@/components/admin/ui";
 import { DayBars, HBars } from "@/components/admin/charts";
 import { PeriodFilter } from "@/components/admin/PeriodFilter";
+import { OnlineNow } from "@/components/admin/OnlineNow";
 import { dailySeries, dashboardStats, funnel, parsePeriod, productBreakdown, trafficSources } from "@/server/admin/stats";
 import { envHealth } from "@/lib/env";
 import { formatBRL, formatDate } from "@/utils/format";
@@ -33,9 +34,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       {missing.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           <strong>Configuração pendente:</strong> {missing.map((m) => m.key).join(", ")}.{" "}
-          <Link href="/admin/configuracoes" className="underline">Ver detalhes</Link>
+          <Link href="/admin/integracoes" className="underline">Ver integrações</Link>
         </div>
       )}
+
+      <div className="mb-6">
+        <OnlineNow />
+      </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Faturamento" value={formatBRL(s.revenue)} hint={`${s.paid} pedido(s) pago(s)`} />
