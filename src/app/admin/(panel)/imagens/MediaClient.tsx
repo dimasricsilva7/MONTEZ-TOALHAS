@@ -2,14 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { ActionForm, ConfirmAction, SubmitButton } from "@/components/admin/client";
-import { UploadButton } from "@/components/admin/media";
+import { LinkImport, UploadButton } from "@/components/admin/media";
 import { CATEGORY_LABEL, MEDIA_CATEGORIES } from "@/utils/media";
 import { inputCls, labelCls } from "@/components/admin/ui";
 import { deleteMediaAction, updateMediaAction } from "./actions";
 
 export function MediaUploader({ category }: { category: string }) {
   const router = useRouter();
-  return <UploadButton category={category} multiple label="Enviar imagens" onUploaded={() => router.refresh()} />;
+  return <UploadButton category={category} multiple label="Enviar do computador" onUploaded={() => router.refresh()} />;
+}
+
+export function MediaLinkImport({ category }: { category: string }) {
+  const router = useRouter();
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="mb-2 text-sm font-semibold text-slate-900">Adicionar imagem por link</p>
+      <LinkImport category={category} onImported={() => router.refresh()} />
+    </div>
+  );
 }
 
 type A = { id: string; name: string; url: string; alt: string; category: string; device: string; page: string; section: string; active: boolean; size: number | null; width: number | null; height: number | null };

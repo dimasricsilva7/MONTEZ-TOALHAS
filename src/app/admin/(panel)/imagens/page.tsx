@@ -3,7 +3,7 @@ import { MediaCategory } from "@prisma/client";
 import { db } from "@/lib/db";
 import { EmptyState, PageHeader, inputCls } from "@/components/admin/ui";
 import { CATEGORY_LABEL, MEDIA_CATEGORIES } from "@/utils/media";
-import { MediaUploader, MediaEditor } from "./MediaClient";
+import { MediaLinkImport, MediaUploader, MediaEditor } from "./MediaClient";
 
 export const metadata: Metadata = { title: "Imagens" };
 
@@ -17,7 +17,8 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
   });
   return (
     <>
-      <PageHeader title="Imagens" description="Biblioteca de mídia. Envios são convertidos para WebP e redimensionados automaticamente." actions={<MediaUploader category={cat ?? "OUTROS"} />} />
+      <PageHeader title="Imagens" description="Envie do computador (vários de uma vez) ou por link. As imagens são otimizadas (WebP) e guardadas na própria loja." actions={<MediaUploader category={cat ?? "OUTROS"} />} />
+      <MediaLinkImport category={cat ?? "OUTROS"} />
       <form className="mb-4 flex flex-wrap gap-2" method="get">
         <input name="q" defaultValue={sp.q} placeholder="Buscar por nome ou alt" className={`${inputCls} !w-60`} />
         <select name="categoria" defaultValue={cat ?? ""} className={`${inputCls} !w-48`}>

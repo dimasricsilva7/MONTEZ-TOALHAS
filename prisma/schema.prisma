@@ -194,6 +194,10 @@ model MediaAsset {
   size          Int?
   width         Int?
   height        Int?
+  /// "db" = bytes guardados em `data` e servidos por /media/[id] (cache de CDN); "blob" = Vercel Blob; "link" = URL externa
+  storage       String         @default("blob")
+  data          Bytes?
+  sourceUrl     String?
   active        Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
