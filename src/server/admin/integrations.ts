@@ -89,9 +89,19 @@ async function checkMeta(): Promise<IntegrationCheck> {
       continue;
     }
     try {
-      const res = await timed(fetch(`https://graph.facebook.com/v21.0/${p.id}?fields=id,name&access_token=${encodeURIComponent(p.token)}`, { cache: "no-store" }));
-      const json = (await res.json().catch(() => ({}))) as { name?: string; error?: { message?: string } };
-      if (res.ok) details.push(`Pixel ${p.id}${json.name ? ` (${json.name})` : ""}: navegador + CAPI OK`);
+      // Valida o token sem enviar evento: com "data" vazio, um token válido recebe
+      // "param data must be non-empty" (código 100); um inválido recebe erro de autenticação (190).
+      const res = await timed(
+        fetch(`https://graph.facebook.com/v21.0/${p.id}/events?access_token=${encodeURIComponent(p.token)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: [] }),
+          cache: "no-store",
+        })
+      );
+      const json = (await res.json().catch(() => ({}))) as { error?: { message?: string; code?: number } };
+      const tokenOk = json.error?.code === 100 && /non-empty/i.test(json.error.message ?? "");
+      if (tokenOk) details.push(`Pixel ${p.id}: navegador + Conversions API OK`);
       else {
         bad++;
         details.push(`Pixel ${p.id}: token CAPI recusado — ${json.error?.message?.slice(0, 90) ?? res.status}`);
